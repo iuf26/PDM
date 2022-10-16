@@ -46,7 +46,9 @@
     ]
   },
   "devDependencies": {
-    "@capacitor/cli": "2.4.1"
+    "@capacitor/cli": "2.4.1",
+    "@types/luxon": "^3.0.1",
+    "luxon": "^3.0.4"
   },
   "description": "An Ionic project"
 }
