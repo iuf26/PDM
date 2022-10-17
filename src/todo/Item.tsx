@@ -18,11 +18,12 @@ const Item: React.FC<ItemPropsExt> = ({
   const handleEdit = useCallback(() => onEdit(id), [id, onEdit]);
   return (
     <IonItem onClick={handleEdit}>
+        <IonLabel>{id.toString()}</IonLabel>
       <IonLabel>{airlineCode}</IonLabel>
       <IonLabel>
-        {DateTime.fromISO(new Date(estimatedArrival).toISOString()).toLocaleString(
-          DateTime.DATETIME_MED
-        )}
+        {DateTime.fromISO(
+          new Date(estimatedArrival).toISOString()
+        ).toLocaleString(DateTime.DATETIME_MED)}
       </IonLabel>
       <IonLabel>{landed.toString()}</IonLabel>
     </IonItem>

@@ -36,6 +36,8 @@ const ItemEdit: React.FC<ItemEditProps> = ({ history, match }) => {
     }
   }, [match.params.id, items]);
   const handleSave = useCallback(() => {
+    const routeId = match.params.id || -1;
+    const item = items?.find((it) => it.id.toString() === routeId);
     const editedItem = item ? { ...item, airlineCode } : null;
     if (editedItem) {
       saveItem && saveItem(editedItem).then(() => history.goBack());
@@ -46,7 +48,7 @@ const ItemEdit: React.FC<ItemEditProps> = ({ history, match }) => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Edit</IonTitle>
+          <IonTitle>Editare</IonTitle>
           <IonButtons slot="end">
             <IonButton onClick={handleSave}>Save</IonButton>
           </IonButtons>
@@ -55,12 +57,16 @@ const ItemEdit: React.FC<ItemEditProps> = ({ history, match }) => {
       <IonContent>
         <IonInput
           value={airlineCode}
-          onIonChange={(e) => setAirlineCode(e.detail.value || "")}
-        />
-        <IonLoading isOpen={saving} />
+          onIonChange={(e) => {
+            setAirlineCode(e.detail.value || "");
+          }}
+        >
+          New Airline Code:
+        </IonInput>
+        {/* <IonLoading isOpen={saving} />
         {savingError && (
           <div>{savingError.message || "Failed to save item"}</div>
-        )}
+        )} */}
       </IonContent>
     </IonPage>
   );
