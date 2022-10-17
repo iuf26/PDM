@@ -1,11 +1,11 @@
-LAB1:
--App will hold a list of flightsArrival elements
-flight:airline_code(string) id(numeric) estimated_arrival(date) landed(boolean) 
+# LAB1:
+###### App will hold a list of flightsArrival elements
+###### flight:airline_code(string) id(numeric) estimated_arrival(date) landed(boolean) 
 
--Functionalities:
-    * View flights list
+# Functionalities:
+    View flights list
         -4 columns(id,airlineCode,estimatedArrival,landed)
-    * Add a flight
+    Add a flight
         -using the plus button on the bottom-right corner
         -After clicking the "+" button you'll be redireted to a new page 
         where you can enter the properties of this new flight you wish to add as follows:
