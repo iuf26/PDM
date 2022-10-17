@@ -18,7 +18,7 @@ const Item: React.FC<ItemPropsExt> = ({
   const handleEdit = useCallback(() => onEdit(id), [id, onEdit]);
   return (
     <IonItem onClick={handleEdit}>
-        <IonLabel>{id.toString()}</IonLabel>
+      <IonLabel>{id.toString()}</IonLabel>
       <IonLabel>{airlineCode}</IonLabel>
       <IonLabel>
         {DateTime.fromISO(
