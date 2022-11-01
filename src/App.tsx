@@ -24,6 +24,7 @@ import "@ionic/react/css/display.css";
 import "./theme/variables.css";
 import { ItemProvider } from "./todo/ItemProvider";
 import { ItemAdd } from "./todo/ItemAdd";
+import { Login } from "./components/Login";
 
 const App: React.FC = () => (
   <IonApp>
@@ -33,7 +34,8 @@ const App: React.FC = () => (
           <Route path="/items" component={ItemList} exact={true} />
           <Route path="/item" component={ItemAdd} exact={true} />
           <Route path="/item/:id" component={ItemEdit} exact={true} />
-          <Route exact path="/" render={() => <Redirect to="/items" />} />
+          <Route exact path="/" render={() => <Redirect to="/login" />} />
+          <Route exact path="/login" render={() => <Login/>} />
         </IonRouterOutlet>
       </IonReactRouter>
     </ItemProvider>

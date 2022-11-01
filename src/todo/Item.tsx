@@ -14,7 +14,6 @@ const Item: React.FC<ItemPropsExt> = ({
   landed,
   onEdit,
 }) => {
-  console.log(landed);
   const handleEdit = useCallback(() => onEdit(id), [id, onEdit]);
   return (
     <IonItem onClick={handleEdit}>

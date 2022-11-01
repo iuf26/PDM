@@ -26,9 +26,11 @@ function withLogs<T>(promise: Promise<ResponseProps<T>>, fnName: string): Promis
 
 const config = {
   headers: {
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${localStorage.getItem("token")}`
   }
 };
+  
 
 export const getItems: () => Promise<ItemProps[]> = () => {
   return withLogs(axios.get(itemUrl, config), 'getItems');
