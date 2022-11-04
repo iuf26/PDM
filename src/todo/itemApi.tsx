@@ -37,7 +37,7 @@ export const getItems: () => Promise<ItemProps[]> = () => {
 }
 
 export const createItem: (item: ItemProps) => Promise<ItemProps[]> = item => {
-  return withLogs(axios.post(itemUrl, item, config), 'createItem');
+  return withLogs(axios.post(`${itemUrl}?userId=${localStorage.getItem("userId")}`, item, config), 'createItem');
 }
 
 export const updateItem: (item: ItemProps) => Promise<ItemProps[]> = item => {

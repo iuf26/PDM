@@ -3,4 +3,5 @@ export interface ItemProps {
   airlineCode: string;
   landed: boolean;
   estimatedArrival: Date;
+  userId?: number;
 }

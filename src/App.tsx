@@ -25,21 +25,24 @@ import "./theme/variables.css";
 import { ItemProvider } from "./todo/ItemProvider";
 import { ItemAdd } from "./todo/ItemAdd";
 import { Login } from "./components/Login";
+import { AppContextProvider } from "./components/AppContext";
 
 const App: React.FC = () => (
-  <IonApp>
-    <ItemProvider>
-      <IonReactRouter>
-        <IonRouterOutlet>
-          <Route path="/items" component={ItemList} exact={true} />
-          <Route path="/item" component={ItemAdd} exact={true} />
-          <Route path="/item/:id" component={ItemEdit} exact={true} />
-          <Route exact path="/" render={() => <Redirect to="/login" />} />
-          <Route exact path="/login" render={() => <Login/>} />
-        </IonRouterOutlet>
-      </IonReactRouter>
-    </ItemProvider>
-  </IonApp>
+  <AppContextProvider>
+    <IonApp>
+      <ItemProvider>
+        <IonReactRouter>
+          <IonRouterOutlet>
+            <Route path="/items" component={ItemList} exact={true} />
+            <Route path="/item" component={ItemAdd} exact={true} />
+            <Route path="/item/:id" component={ItemEdit} exact={true} />
+            <Route exact path="/" render={() => <Redirect to="/login" />} />
+            <Route exact path="/login" render={() => <Login />} />
+          </IonRouterOutlet>
+        </IonReactRouter>
+      </ItemProvider>
+    </IonApp>
+  </AppContextProvider>
 );
 
 export default App;

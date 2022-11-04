@@ -1,14 +1,13 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Redirect } from "react-router-dom";
-import { ItemList } from "../todo";
-import { baseUrl } from "../todo/itemApi";
+import { AppContext } from "./AppContext";
 
 export function Login() {
   const [username, setUsername] = useState("");
   const [pass, setPass] = useState("");
   const [okLogin, setOkLogin] = useState(false);
-
+  const { userId, setUserId } = useContext(AppContext);
   const doLogin = () => {
     axios
       .post(`http://localhost:3000/login`, {
@@ -17,6 +16,8 @@ export function Login() {
       })
       .then((res) => {
         if (res.status === 200) {
+          setUserId(res.data.userId)
+          localStorage.setItem("userId", res.data.userId);
           localStorage.setItem("token", res.data.token);
           setOkLogin(true);
         } else {
@@ -24,8 +25,6 @@ export function Login() {
         }
       })
       .catch((e) => console.log(e));
-
-  
   };
 
   return (

@@ -17,6 +17,7 @@ export interface ItemsState {
   saving: boolean;
   savingError?: Error | null;
   saveItem?: SaveItemFn;
+  
 }
 
 interface ActionProps {
@@ -24,10 +25,9 @@ interface ActionProps {
   payload?: any;
 }
 
-
-const initialState: ItemsState = {
+export const initialState: ItemsState = {
   fetching: false,
-  saving: false
+  saving: false,
 };
 
 const FETCH_ITEMS_STARTED = "FETCH_ITEMS_STARTED";
@@ -36,8 +36,9 @@ const FETCH_ITEMS_FAILED = "FETCH_ITEMS_FAILED";
 const SAVE_ITEM_STARTED = "SAVE_ITEM_STARTED";
 const SAVE_ITEM_SUCCEEDED = "SAVE_ITEM_SUCCEEDED";
 const SAVE_ITEM_FAILED = "SAVE_ITEM_FAILED";
+export const LOGIN_START = "LOGIN";
 
-const reducer: (state: ItemsState, action: ActionProps) => ItemsState = (
+export const reducer: (state: ItemsState, action: ActionProps) => ItemsState = (
   state,
   { type, payload }
 ) => {
@@ -62,6 +63,8 @@ const reducer: (state: ItemsState, action: ActionProps) => ItemsState = (
       return { ...state, items, saving: false };
     case SAVE_ITEM_FAILED:
       return { ...state, savingError: payload.error, saving: false };
+    case LOGIN_START:
+      return { ...state, userId: payload.userId };
     default:
       return state;
   }
@@ -101,9 +104,11 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children }) => {
       try {
         log("fetchItems started");
         dispatch({ type: FETCH_ITEMS_STARTED });
-        const items = await getItems();
+        let items = await getItems();
         log("fetchItems succeeded");
         if (!canceled) {
+          console.log(items[0]);
+          items = items.filter((elem:ItemProps) => elem.userId?.toString() === localStorage.getItem("userId"))
           dispatch({ type: FETCH_ITEMS_SUCCEEDED, payload: { items } });
         }
       } catch (error) {
@@ -117,7 +122,9 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children }) => {
     try {
       log("saveItem started");
       dispatch({ type: SAVE_ITEM_STARTED });
-      const savedItem = await (item.id !== -1 ? updateItem(item) : createItem(item));
+      const savedItem = await (item.id !== -1
+        ? updateItem(item)
+        : createItem(item));
       log("saveItem succeeded");
       dispatch({ type: SAVE_ITEM_SUCCEEDED, payload: { item: savedItem } });
     } catch (error) {

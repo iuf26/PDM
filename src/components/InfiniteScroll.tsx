@@ -22,24 +22,55 @@ export function InfiniteScroll() {
   const { items } = useContext(ItemContext);
   const [data, setData] = useState<ItemProps[]>([]);
   const [isInfiniteDisabled, setInfiniteDisabled] = useState(false);
-  const pushData = useCallback(() => {
+  const [firstLoad,setFirstLoad] = useState(true)
+  const pushData = () => {
     if (items) {
+      
+      let max;
       if (data.length >= items.length) return;
-      const max = data.length + 20;
+      if (data.length + 20 >= items.length) {
+        max = items.length;
+      } else {
+        max = data.length + 20;
+      }
       const min = max - 20;
       const newData = [];
       for (let i = min; i < max; i++) {
         newData.push(items[i]);
       }
       setData([...data, ...newData]);
-    }
-  }, [items, data]);
+    }}
+
 
   useEffect(() => {
-    pushData();
+    if (items) {
+      // console.log("items changed",items[items.length - 1]);
+      // if (data.length > 0) {
+      //   const elem = items[items.length - 1];
+      //   const newData = data;
+      //   newData.push(elem);
+      //   // for (let i = min; i < max; i++) {
+      //   //   newData.push(items[i]);
+      //   // }
+      //   console.log(newData);
+      //   setData(newData);
+      // } else {
+      if (data.length > 0) {
+        let copy = [...data];
+        copy.pop();
+        let res = [...copy,items[0]];
+      
+        setData(res);
+        return;
+      }
+
+      pushData();
+    }
   }, [items]);
   const loadData = (ev: any) => {
+    
     setTimeout(() => {
+      console.log("In set time");
       pushData();
       ev.target.complete();
       if (data.length === 1000) {

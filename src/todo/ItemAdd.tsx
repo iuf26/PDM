@@ -32,7 +32,7 @@ export const ItemAdd: React.FC<RouteComponentProps> = ({ history }) => {
       airlineCode,
     };
     
-    saveItem && saveItem(item).then(() => history.goBack());
+    saveItem && saveItem(item).then(() => history.push("/items"));
   }, [saveItem, airlineCode, history, landed, eta, id]);
   return (
     <IonPage>
