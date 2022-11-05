@@ -16,6 +16,9 @@ import {
 import { RouteComponentProps } from "react-router";
 import { ItemContext } from "./ItemProvider";
 import { ItemProps } from "./ItemProps";
+import { Plugins } from "@capacitor/core";
+const { Network } = Plugins;
+const { Storage } = Plugins;
 
 export const ItemAdd: React.FC<RouteComponentProps> = ({ history }) => {
   const { items, saveItem } = useContext(ItemContext);
@@ -24,16 +27,47 @@ export const ItemAdd: React.FC<RouteComponentProps> = ({ history }) => {
   const [id, setId] = useState(-1);
   const [eta, setEta] = useState(new Date());
   const [isPickerOpen, setIsPickerOpen] = useState(false);
-  const handleSave = useCallback(() => {
+  const [networkStatus, setNetworkStatus] = useState(true);
+  const setItemOffline = async (value: string) => {
+    await Storage.set({
+      key: "add",
+      value,
+    });
+  };
+  const getAddData = async () => {
+    let res = (await Storage.get({ key: "add" })).value;
+    if (res) {
+      return JSON.parse(res);
+    }
+    return res;
+  };
+  const handleSave = useCallback(async () => {
+   
     const item: ItemProps = {
       id,
       landed,
       estimatedArrival: eta,
       airlineCode,
     };
-    
-    saveItem && saveItem(item).then(() => history.push("/items"));
+    if (networkStatus) {
+      
+      saveItem && saveItem(item).then(() => history.push("/items"));
+    } else {
+      console.log("do an offline saving...");
+      let res = await getAddData();
+
+      if (res) {
+        res.push(item);
+        console.log(res);
+        setItemOffline(JSON.stringify(res)).then(() => history.push("/items"));
+      }
+    }
   }, [saveItem, airlineCode, history, landed, eta, id]);
+  Network.addListener("networkStatusChange", (status) => {
+    console.log("Network status changed in addd item", status);
+
+    setNetworkStatus(status.connected);
+  });
   return (
     <IonPage>
       <IonHeader>
@@ -45,7 +79,6 @@ export const ItemAdd: React.FC<RouteComponentProps> = ({ history }) => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
-       
         <IonInput onIonChange={(e) => setAirlineCode(e.detail.value || "")}>
           AirlineCode:
         </IonInput>

@@ -2,12 +2,20 @@ import axios from "axios";
 import React, { useContext, useState } from "react";
 import { Redirect } from "react-router-dom";
 import { AppContext } from "./AppContext";
+import { Plugins } from "@capacitor/core";
+const {Storage} = Plugins;
 
 export function Login() {
   const [username, setUsername] = useState("");
   const [pass, setPass] = useState("");
   const [okLogin, setOkLogin] = useState(false);
   const { userId, setUserId } = useContext(AppContext);
+  const setStoreUserId = async (id:string) => {
+    await Storage.set({
+      key: "userId",
+      value:id,
+    });
+  };
   const doLogin = () => {
     axios
       .post(`http://localhost:3000/login`, {
@@ -17,6 +25,7 @@ export function Login() {
       .then((res) => {
         if (res.status === 200) {
           setUserId(res.data.userId)
+          setStoreUserId(res.data.userId.toString())
           localStorage.setItem("userId", res.data.userId);
           localStorage.setItem("token", res.data.token);
           setOkLogin(true);

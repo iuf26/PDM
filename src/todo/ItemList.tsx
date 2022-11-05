@@ -20,17 +20,77 @@ import { ItemContext } from "./ItemProvider";
 import { InfiniteScroll } from "../components/InfiniteScroll";
 import { SearchBar } from "../components/SearchBar";
 import { AppContext } from "../components/AppContext";
+//import { Network } from '../../node_modules/@capacitor/network';
+import { Plugins } from "@capacitor/core";
+const { Network } = Plugins;
+const {Storage} = Plugins;
+
 
 const log = getLogger("ItemList");
 
 const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
-  const { items, fetching, fetchingError } = useContext(ItemContext);
+  const { items, fetching, fetchingError,saveItem } = useContext(ItemContext);
   const { userId } = useContext(AppContext);
   const [logout, setLogout] = useState(false);
+  const [networkStatus, setNetworkStatus] = useState(true);
   useEffect(() => {
     console.log(logout);
   }, [logout]);
- 
+  const setItemOffline = async (value: string) => {
+    await Storage.set({
+      key: "add",
+      value,
+    });
+  };
+  Network.addListener("networkStatusChange",async (status) => {
+    console.log("Network status changed", status);
+    if(status.connected){
+      let res = await getAddData();
+      if (res && res.length > 0) {
+        if (res[0] && saveItem) {
+          await saveItem(res[0]);
+
+          await setItemOffline(JSON.stringify([]));
+        }
+      }
+    }
+    setNetworkStatus(status.connected);
+  });
+  const getAddData = async () => {
+    let res = (await Storage.get({ key: "add" })).value;
+    if (res) {
+      return JSON.parse(res);
+    }
+    return res;
+  };
+  const logCurrentNetworkStatus = async () => {
+    const status = await Network.getStatus();
+
+    console.log("Network status:", status);
+  };
+  const setName = async () => {
+    await Storage.set({
+      key: "name",
+      value: "Max",
+    });
+  };
+
+  const checkName = async () => {
+    const { value } = await Storage.get({ key: "name" });
+
+    console.log(`Hello ${value}!`);
+  };
+  const checkUserId = async () => {
+    const { value } = await Storage.get({ key: "userId" });
+    console.log("userdid:",value);
+  }
+  const removeName = async () => {
+    await Storage.remove({ key: "name" });
+  };
+
+  useEffect(() => {
+   checkUserId() 
+  },[networkStatus])
   return (
     <>
       {!logout ? (
@@ -51,7 +111,9 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
               >
                 Log out
               </IonButton>
-                <IonButton>Network status:</IonButton>
+              <IonButton>
+                Network status:{networkStatus ? "online" : "offline"}
+              </IonButton>
               <IonLoading isOpen={fetching} message="Fetching items" />
               {/* {items && (
               <IonList>
@@ -62,7 +124,7 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
               <SearchBar />
 
               <br></br>
-              <InfiniteScroll />
+              <InfiniteScroll history={history} />
               {fetchingError && (
                 <div>{fetchingError.message || "Failed to fetch items"}</div>
               )}

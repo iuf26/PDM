@@ -18,7 +18,7 @@ import { ItemContext } from "../todo/ItemProvider";
 import { ItemProps } from "../todo/ItemProps";
 import Item from "../todo/Item";
 import { Redirect } from "react-router-dom";
-export function InfiniteScroll() {
+export function InfiniteScroll({history}:any) {
   const { items } = useContext(ItemContext);
   const [data, setData] = useState<ItemProps[]>([]);
   const [isInfiniteDisabled, setInfiniteDisabled] = useState(false);
@@ -92,7 +92,7 @@ export function InfiniteScroll() {
                   airlineCode={airlineCode}
                   estimatedArrival={estimatedArrival}
                   landed={landed}
-                  onEdit={(id) => id}
+                  onEdit={id => history.push(`/item/${id?.toString()}`)}
                 />
               )
             )}
