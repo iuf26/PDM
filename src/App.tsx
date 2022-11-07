@@ -26,7 +26,11 @@ import { ItemProvider } from "./todo/ItemProvider";
 import { ItemAdd } from "./todo/ItemAdd";
 import { Login } from "./components/Login";
 import { AppContextProvider } from "./components/AppContext";
-
+import { Plugins } from "@capacitor/core";
+const { Network } = Plugins;
+Network.addListener("networkStatusChange", async (status) => {
+  localStorage.setItem("net", status.connected.toString());
+});
 const App: React.FC = () => (
   <AppContextProvider>
     <IonApp>

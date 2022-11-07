@@ -14,7 +14,8 @@ import { getLogger } from "../core";
 import { ItemContext } from "./ItemProvider";
 import { RouteComponentProps } from "react-router";
 import { ItemProps } from "./ItemProps";
-
+import { Plugins } from "@capacitor/core";
+const { Storage } = Plugins;
 const log = getLogger("ItemEdit");
 
 interface ItemEditProps
@@ -35,10 +36,38 @@ const ItemEdit: React.FC<ItemEditProps> = ({ history, match }) => {
       setAirlineCode(item.airlineCode);
     }
   }, [match.params.id, items]);
-  const handleSave = useCallback(() => {
+  const setItemOffline = async (value: string) => {
+    await Storage.set({
+      key: "add",
+      value,
+    });
+  };
+  const getAddData = async () => {
+    let res = (await Storage.get({ key: "add" })).value;
+    if (res) {
+      return JSON.parse(res);
+    }
+    return res;
+  };
+  const handleSave = useCallback(async () => {
     const routeId = match.params.id || -1;
     const item = items?.find((it) => it.id.toString() === routeId);
     const editedItem = item ? { ...item, airlineCode } : null;
+    if (localStorage.getItem("net") === "false") {
+      let res = await getAddData();
+
+      if (res) {
+        res.push(editedItem);
+      } else {
+        res = [];
+        res.push(editedItem);
+      }
+
+      await setItemOffline(JSON.stringify(res));
+      history.goBack();
+      return;
+    }
+
     if (editedItem) {
       saveItem && saveItem(editedItem).then(() => history.goBack());
     }

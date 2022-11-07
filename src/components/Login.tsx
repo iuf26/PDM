@@ -3,17 +3,17 @@ import React, { useContext, useState } from "react";
 import { Redirect } from "react-router-dom";
 import { AppContext } from "./AppContext";
 import { Plugins } from "@capacitor/core";
-const {Storage} = Plugins;
+const { Storage } = Plugins;
 
 export function Login() {
   const [username, setUsername] = useState("");
   const [pass, setPass] = useState("");
   const [okLogin, setOkLogin] = useState(false);
   const { userId, setUserId } = useContext(AppContext);
-  const setStoreUserId = async (id:string) => {
+  const setStoreUserId = async (id: string) => {
     await Storage.set({
       key: "userId",
-      value:id,
+      value: id,
     });
   };
   const doLogin = () => {
@@ -24,10 +24,11 @@ export function Login() {
       })
       .then((res) => {
         if (res.status === 200) {
-          setUserId(res.data.userId)
-          setStoreUserId(res.data.userId.toString())
+          setUserId(res.data.userId);
+          setStoreUserId(res.data.userId.toString());
           localStorage.setItem("userId", res.data.userId);
           localStorage.setItem("token", res.data.token);
+          localStorage.setItem("net", "true");
           setOkLogin(true);
         } else {
           console.log("Invalid account");
