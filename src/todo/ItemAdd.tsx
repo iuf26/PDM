@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useState } from "react";
+import React, { Component, useCallback, useContext, useState } from "react";
 import {
   IonButton,
   IonButtons,
@@ -12,6 +12,7 @@ import {
   IonPicker,
   IonTitle,
   IonToolbar,
+  IonAlert,
 } from "@ionic/react";
 import { RouteComponentProps } from "react-router";
 import { ItemContext } from "./ItemProvider";
@@ -19,15 +20,21 @@ import { ItemProps } from "./ItemProps";
 import { Plugins } from "@capacitor/core";
 const { Network } = Plugins;
 const { Storage } = Plugins;
-
-export const ItemAdd: React.FC<RouteComponentProps> = ({ history }) => {
+interface AddItemProps {
+  netStat: boolean;
+  goBack(v: boolean): any;
+}
+export const ItemAdd: React.FunctionComponent<AddItemProps> = ({
+  netStat,
+  goBack,
+}) => {
   const { items, saveItem } = useContext(ItemContext);
   const [airlineCode, setAirlineCode] = useState("");
   const [landed, setLanded] = useState(false);
   const [id, setId] = useState(-1);
   const [eta, setEta] = useState(new Date());
   const [isPickerOpen, setIsPickerOpen] = useState(false);
-  const [networkStatus, setNetworkStatus] = useState(true);
+  const [showAlert, setShowAlert] = useState(false);
   const setItemOffline = async (value: string) => {
     await Storage.set({
       key: "add",
@@ -42,32 +49,32 @@ export const ItemAdd: React.FC<RouteComponentProps> = ({ history }) => {
     return res;
   };
   const handleSave = useCallback(async () => {
-   
     const item: ItemProps = {
       id,
       landed,
       estimatedArrival: eta,
       airlineCode,
     };
-    if (networkStatus) {
-      
-      saveItem && saveItem(item).then(() => history.push("/items"));
+    if (netStat) {
+      console.log("in here");
+      saveItem && saveItem(item);
     } else {
       console.log("do an offline saving...");
       let res = await getAddData();
 
       if (res) {
         res.push(item);
-        console.log(res);
-        setItemOffline(JSON.stringify(res)).then(() => history.push("/items"));
+      } else {
+        res = [];
+        res.push(item);
       }
-    }
-  }, [saveItem, airlineCode, history, landed, eta, id]);
-  Network.addListener("networkStatusChange", (status) => {
-    console.log("Network status changed in addd item", status);
 
-    setNetworkStatus(status.connected);
-  });
+      await setItemOffline(JSON.stringify(res));
+    }
+    goBack(false);
+    //
+  }, [saveItem, airlineCode, landed, eta, id]);
+
   return (
     <IonPage>
       <IonHeader>
@@ -79,6 +86,7 @@ export const ItemAdd: React.FC<RouteComponentProps> = ({ history }) => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
+        <IonButton>Network status:{netStat ? "online" : "offline"}</IonButton>
         <IonInput onIonChange={(e) => setAirlineCode(e.detail.value || "")}>
           AirlineCode:
         </IonInput>
@@ -144,6 +152,14 @@ export const ItemAdd: React.FC<RouteComponentProps> = ({ history }) => {
             }}
           ></IonDatetime>
         </IonItem>
+        <IonAlert
+          isOpen={showAlert}
+          onDidDismiss={() => setShowAlert(false)}
+          header="Alert"
+          subHeader="Important message"
+          message="This is an alert!"
+          buttons={["OK"]}
+        />
       </IonContent>
     </IonPage>
   );

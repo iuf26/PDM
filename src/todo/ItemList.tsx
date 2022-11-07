@@ -22,17 +22,20 @@ import { SearchBar } from "../components/SearchBar";
 import { AppContext } from "../components/AppContext";
 //import { Network } from '../../node_modules/@capacitor/network';
 import { Plugins } from "@capacitor/core";
+import { ItemAdd } from "./ItemAdd";
 const { Network } = Plugins;
-const {Storage} = Plugins;
-
+const { Storage } = Plugins;
 
 const log = getLogger("ItemList");
 
 const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
-  const { items, fetching, fetchingError,saveItem } = useContext(ItemContext);
+  const { items, fetching, fetchingError, saveItem } = useContext(ItemContext);
   const { userId } = useContext(AppContext);
   const [logout, setLogout] = useState(false);
   const [networkStatus, setNetworkStatus] = useState(true);
+  const [itemAddView, setItemAddView] = useState(false);
+  const [stop,setStop] = useState(false);
+
   useEffect(() => {
     console.log(logout);
   }, [logout]);
@@ -42,18 +45,26 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
       value,
     });
   };
-  Network.addListener("networkStatusChange",async (status) => {
-    console.log("Network status changed", status);
-    if(status.connected){
+  Network.addListener("networkStatusChange", async (status) => {
+    console.log("Network status changed in item list", status);
+    if (status.connected) {
       let res = await getAddData();
       if (res && res.length > 0) {
-        if (res[0] && saveItem) {
-          await saveItem(res[0]);
+        if (saveItem) {
+          if(!stop){
+          for (let i = 0; i < res.length; i++) {
+            saveItem(res[i]);
+          }
 
           await setItemOffline(JSON.stringify([]));
+          setStop(true);
+        }
         }
       }
+    }else{
+      setStop(false);
     }
+
     setNetworkStatus(status.connected);
   });
   const getAddData = async () => {
@@ -82,61 +93,65 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
   };
   const checkUserId = async () => {
     const { value } = await Storage.get({ key: "userId" });
-    console.log("userdid:",value);
-  }
+    console.log("userdid:", value);
+  };
   const removeName = async () => {
     await Storage.remove({ key: "name" });
   };
 
   useEffect(() => {
-   checkUserId() 
-  },[networkStatus])
+    checkUserId();
+  }, [networkStatus]);
   return (
     <>
       {!logout ? (
         localStorage.getItem("token") ? (
-          <IonPage>
-            <IonHeader>
-              <IonToolbar>
-                <IonTitle>My App</IonTitle>
-              </IonToolbar>
-            </IonHeader>
-            <IonContent>
-              <IonButton
-                onClick={() => {
-                  localStorage.removeItem("token");
-                  localStorage.removeItem("userId");
-                  setLogout(true);
-                }}
-              >
-                Log out
-              </IonButton>
-              <IonButton>
-                Network status:{networkStatus ? "online" : "offline"}
-              </IonButton>
-              <IonLoading isOpen={fetching} message="Fetching items" />
-              {/* {items && (
+          itemAddView ? (
+            <ItemAdd netStat={networkStatus} goBack={setItemAddView} />
+          ) : (
+            <IonPage>
+              <IonHeader>
+                <IonToolbar>
+                  <IonTitle>My App</IonTitle>
+                </IonToolbar>
+              </IonHeader>
+              <IonContent>
+                <IonButton
+                  onClick={() => {
+                    localStorage.removeItem("token");
+                    localStorage.removeItem("userId");
+                    setLogout(true);
+                  }}
+                >
+                  Log out
+                </IonButton>
+                <IonButton>
+                  Network status:{networkStatus ? "online" : "offline"}
+                </IonButton>
+                <IonLoading isOpen={fetching} message="Fetching items" />
+                {/* {items && (
               <IonList>
               {items.map(({ id, airlineCode,estimatedArrival,landed}) =>
               <Item key={id} id={id} airlineCode={airlineCode} estimatedArrival = {estimatedArrival} landed = {landed} onEdit={id => history.push(`/item/${id?.toString()}`)} />)}
               </IonList>
             )} */}
-              <SearchBar />
+                <SearchBar />
 
-              <br></br>
-              <InfiniteScroll history={history} />
-              {fetchingError && (
-                <div>{fetchingError.message || "Failed to fetch items"}</div>
-              )}
-              <IonFab vertical="bottom" horizontal="end" slot="fixed">
-                <IonFabButton onClick={() => history.push("/item")}>
-                  <IonIcon icon={add} />
-                </IonFabButton>
-              </IonFab>
-            </IonContent>
-          </IonPage>
+                <br></br>
+                <InfiniteScroll history={history} />
+                {fetchingError && (
+                  <div>{fetchingError.message || "Failed to fetch items"}</div>
+                )}
+                <IonFab vertical="bottom" horizontal="end" slot="fixed">
+                  <IonFabButton onClick={() => setItemAddView(true)}>
+                    <IonIcon icon={add} />
+                  </IonFabButton>
+                </IonFab>
+              </IonContent>
+            </IonPage>
+          )
         ) : (
-          <div>Retrieving items...</div>
+          <div>You do not have acces to items...</div>
         )
       ) : (
         <Redirect to="/login" />
