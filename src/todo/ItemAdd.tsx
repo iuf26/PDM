@@ -68,8 +68,11 @@ export const ItemAdd: React.FunctionComponent<AddItemProps> = ({
         res = [];
         res.push(item);
       }
-
-      await setItemOffline(JSON.stringify(res));
+      const dd = items;
+      if(dd){
+      dd.unshift(item)}
+      await setItemOffline(JSON.stringify(dd));
+      alert("Your data won't be sended to the server ,you are in offline mode")
     }
     goBack(false);
     //

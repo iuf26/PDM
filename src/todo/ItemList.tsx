@@ -36,13 +36,16 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
   const [logout, setLogout] = useState(false);
   const [networkStatus, setNetworkStatus] = useState(true);
   const [itemAddView, setItemAddView] = useState(false);
-  const [stop, setStop] = useState(false);
-  const [checkC,setCheckC] = useState(false);
-  const [itemsToShow,setItemsShow] = useState<ItemProps[]>();
+  const [stop,setStop] = useState(false);
+  const [filter,setFilter] = useState(false);
+  const [check,setCheck] = useState(false);
+  const [elemsToDisplay,setElemsToDisplay] = useState<ItemProps[]>()
+  
 
   useEffect(() => {
     console.log(logout);
   }, [logout]);
+
   const setItemOffline = async (value: string) => {
     await Storage.set({
       key: "add",
@@ -55,10 +58,10 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
       let res = await getAddData();
       if (res && res.length > 0) {
         if (saveItem) {
-          if (!stop) {
-            for (let i = 0; i < res.length; i++) {
-              saveItem(res[i]);
-            }
+          if(!stop){
+          
+            saveItem(res[0]);
+          
 
             await setItemOffline(JSON.stringify([]));
             setStop(true);
@@ -89,7 +92,14 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
       value: "Max",
     });
   };
-
+  // const setOnlyLanded = () => {
+  //     if(!check) {
+  //       setElemsToDisplay(items?.filter(elem => elem.landed === true))
+  //     }else{
+  //       setElemsToDisplay(items);
+  //     }
+  //     setCheck(!check);
+  // }
   const checkName = async () => {
     const { value } = await Storage.get({ key: "name" });
 
@@ -102,15 +112,7 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
   const removeName = async () => {
     await Storage.remove({ key: "name" });
   };
-  const setOnlyLanded = () => {
-      if(!checkC){
-        setItemsShow(items?.filter(elem => elem.landed === true))
-      }else{
-        setItemsShow(items)
-      }
-      setCheckC(!checkC);
-   
-  };
+  
   useEffect(() => {
     checkUserId();
   }, [networkStatus]);
@@ -138,6 +140,8 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
                 >
                   Log out
                 </IonButton>
+                {/* <label>Show only landed </label>
+                <IonCheckbox onClick={() => setOnlyLanded()}></IonCheckbox> */}
                 <IonButton>
                   Network status:{networkStatus ? "online" : "offline"}
                 </IonButton>

@@ -64,6 +64,7 @@ const ItemEdit: React.FC<ItemEditProps> = ({ history, match }) => {
       }
 
       await setItemOffline(JSON.stringify(res));
+      alert("Your data won't be sended to the server ,you are in offline mode")
       history.goBack();
       return;
     }

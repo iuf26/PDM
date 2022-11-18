@@ -21,3 +21,12 @@
         -if i have to instances of the client opened and i modify something in one of them
         the changes will be automatically shown on the other client too(thanks to websockets)
     * used redux
+
+
+LAB2
+    Pentru varianta de salvat date offline am folosit Ionic Storage
+    Daca se detecteaza ca a fost intrerupta conexiunea de internet atunci modificarile se salveaza in acest Ionic Storage
+    Am folosit local storage pentru a salva token-ul care este generat de fiecare data cand un utilizator se autentifica
+    Fiecare entitate are un id de utilizator ,se face o filtrare dupa acest id pentru fiecare utilizator
+    pentru a se asigura faptul ca pentru un anumit utilizator sunt afisate doar datele care il privesc pe cel in cauza
+    Pentru paginare am folosit infinite scrolling din Ionic

@@ -11,7 +11,7 @@ export function Login() {
   const [pass, setPass] = useState("");
   const [okLogin, setOkLogin] = useState(false);
   const { userId, setUserId } = useContext(AppContext);
-  const { login } = useContext(AuthContext);
+  const { login, isAuthenticated } = useContext(AuthContext);
   const setStoreUserId = async (id: string) => {
     await Storage.set({
       key: "userId",
@@ -32,7 +32,11 @@ export function Login() {
           localStorage.setItem("token", res.data.token);
           localStorage.setItem("net", "true");
           if (login) login();
+         
           setOkLogin(true);
+          // if (login) {
+          //   login().then((resp) =>{console.log("******")});
+          // }
         } else {
           console.log("Invalid account");
         }

@@ -13,7 +13,6 @@ import Item from "../todo/Item";
 export function SearchBar() {
   const { items } = useContext(ItemContext);
   let [results, setResults] = useState<ItemProps[]>([]);
-  const [onlyLanded, setOnlyLanded] = useState(false);
 
   const handleChange = (ev: Event) => {
     if (items) {
@@ -33,6 +32,8 @@ export function SearchBar() {
   return (
     <>
      
+      
+      
       <IonSearchbar
         debounce={1000}
         onIonChange={(ev) => handleChange(ev)}
