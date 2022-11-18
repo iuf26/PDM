@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { Redirect, RouteComponentProps } from "react-router";
 import {
   IonButton,
+  IonCheckbox,
   IonContent,
   IonFab,
   IonFabButton,
@@ -23,6 +24,7 @@ import { AppContext } from "../components/AppContext";
 //import { Network } from '../../node_modules/@capacitor/network';
 import { Plugins } from "@capacitor/core";
 import { ItemAdd } from "./ItemAdd";
+import { ItemProps } from "./ItemProps";
 const { Network } = Plugins;
 const { Storage } = Plugins;
 
@@ -34,7 +36,9 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
   const [logout, setLogout] = useState(false);
   const [networkStatus, setNetworkStatus] = useState(true);
   const [itemAddView, setItemAddView] = useState(false);
-  const [stop,setStop] = useState(false);
+  const [stop, setStop] = useState(false);
+  const [checkC,setCheckC] = useState(false);
+  const [itemsToShow,setItemsShow] = useState<ItemProps[]>();
 
   useEffect(() => {
     console.log(logout);
@@ -51,17 +55,17 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
       let res = await getAddData();
       if (res && res.length > 0) {
         if (saveItem) {
-          if(!stop){
-          for (let i = 0; i < res.length; i++) {
-            saveItem(res[i]);
-          }
+          if (!stop) {
+            for (let i = 0; i < res.length; i++) {
+              saveItem(res[i]);
+            }
 
-          await setItemOffline(JSON.stringify([]));
-          setStop(true);
-        }
+            await setItemOffline(JSON.stringify([]));
+            setStop(true);
+          }
         }
       }
-    }else{
+    } else {
       setStop(false);
     }
 
@@ -98,7 +102,15 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
   const removeName = async () => {
     await Storage.remove({ key: "name" });
   };
-
+  const setOnlyLanded = () => {
+      if(!checkC){
+        setItemsShow(items?.filter(elem => elem.landed === true))
+      }else{
+        setItemsShow(items)
+      }
+      setCheckC(!checkC);
+   
+  };
   useEffect(() => {
     checkUserId();
   }, [networkStatus]);
@@ -116,6 +128,7 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
                 </IonToolbar>
               </IonHeader>
               <IonContent>
+               
                 <IonButton
                   onClick={() => {
                     localStorage.removeItem("token");
@@ -129,12 +142,7 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
                   Network status:{networkStatus ? "online" : "offline"}
                 </IonButton>
                 <IonLoading isOpen={fetching} message="Fetching items" />
-                {/* {items && (
-              <IonList>
-              {items.map(({ id, airlineCode,estimatedArrival,landed}) =>
-              <Item key={id} id={id} airlineCode={airlineCode} estimatedArrival = {estimatedArrival} landed = {landed} onEdit={id => history.push(`/item/${id?.toString()}`)} />)}
-              </IonList>
-            )} */}
+
                 <SearchBar />
 
                 <br></br>

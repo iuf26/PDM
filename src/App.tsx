@@ -27,26 +27,39 @@ import { ItemAdd } from "./todo/ItemAdd";
 import { Login } from "./components/Login";
 import { AppContextProvider } from "./components/AppContext";
 import { Plugins } from "@capacitor/core";
+import { AuthProvider } from "./components/AuthProvider";
+import { PrivateRoute } from "./components/PrivateRoute";
 const { Network } = Plugins;
 Network.addListener("networkStatusChange", async (status) => {
   localStorage.setItem("net", status.connected.toString());
 });
 const App: React.FC = () => (
-  <AppContextProvider>
+ 
     <IonApp>
-      <ItemProvider>
-        <IonReactRouter>
-          <IonRouterOutlet>
-            <Route path="/items" component={ItemList} exact={true} />
+      <IonReactRouter>
+        <IonRouterOutlet>
+          <AuthProvider>
+            <Route path="/login" component={Login} exact={true} />
+            <ItemProvider>
+              <PrivateRoute path="/items" component={ItemList} exact={true} />
+              <PrivateRoute path="/item" component={ItemAdd} exact={true} />
+              <PrivateRoute
+                path="/item/:id"
+                component={ItemEdit}
+                exact={true}
+              />
+            </ItemProvider>
+            <Route exact path="/" render={() => <Redirect to="/items" />} />
+          </AuthProvider>
+          {/* <Route path="/items" component={ItemList} exact={true} />
             <Route path="/item" component={ItemAdd} exact={true} />
             <Route path="/item/:id" component={ItemEdit} exact={true} />
             <Route exact path="/" render={() => <Redirect to="/login" />} />
-            <Route exact path="/login" render={() => <Login />} />
-          </IonRouterOutlet>
-        </IonReactRouter>
-      </ItemProvider>
+            <Route exact path="/login" render={() => <Login />} /> */}
+        </IonRouterOutlet>
+      </IonReactRouter>
     </IonApp>
-  </AppContextProvider>
+ 
 );
 
 export default App;

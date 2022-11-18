@@ -1,6 +1,7 @@
-import React, { useCallback, useContext, useEffect } from "react";
+import { useCallback, useContext, useEffect } from "react";
 import {
   IonButton,
+  IonCheckbox,
   IonContent,
   IonHeader,
   IonInfiniteScroll,
@@ -13,19 +14,31 @@ import {
   IonToolbar,
   useIonViewWillEnter,
 } from "@ionic/react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { ItemContext } from "../todo/ItemProvider";
 import { ItemProps } from "../todo/ItemProps";
 import Item from "../todo/Item";
 import { Redirect } from "react-router-dom";
-export function InfiniteScroll({history}:any) {
+export function InfiniteScroll({ history }: any) {
   const { items } = useContext(ItemContext);
   const [data, setData] = useState<ItemProps[]>([]);
   const [isInfiniteDisabled, setInfiniteDisabled] = useState(false);
-  const [firstLoad,setFirstLoad] = useState(true)
+  const [firstLoad, setFirstLoad] = useState(true);
+  const [checkC, setCheckC] = useState(false);
+  const [itemsToShow, setItemsShow] = useState<ItemProps[]>();
+  const setOnlyLanded = () => {
+    console.log(checkC);
+    if(items){
+    if (!checkC) {
+      setItemsShow(items?.filter((elem) => elem.landed === true));
+    } else {
+      setItemsShow(items);
+    }
+  }
+    setCheckC(!checkC);
+  };
   const pushData = () => {
     if (items) {
-      
       let max;
       if (data.length >= items.length) return;
       if (data.length + 20 >= items.length) {
@@ -39,8 +52,8 @@ export function InfiniteScroll({history}:any) {
         newData.push(items[i]);
       }
       setData([...data, ...newData]);
-    }}
-
+    }
+  };
 
   useEffect(() => {
     if (items) {
@@ -58,8 +71,8 @@ export function InfiniteScroll({history}:any) {
       if (data.length > 0) {
         let copy = [...data];
         copy.pop();
-        let res = [...copy,items[0]];
-      
+        let res = [...copy, items[0]];
+
         setData(res);
         return;
       }
@@ -68,7 +81,6 @@ export function InfiniteScroll({history}:any) {
     }
   }, [items]);
   const loadData = (ev: any) => {
-    
     setTimeout(() => {
       console.log("In set time");
       pushData();
@@ -81,21 +93,36 @@ export function InfiniteScroll({history}:any) {
 
   return (
     <>
+      <label>Show only landed </label>
+      <IonCheckbox onClick={() => setOnlyLanded()}></IonCheckbox>
       <IonList>
         {
           <IonList>
-            {data.map(
-              ({ id, airlineCode, estimatedArrival, landed }, index) => (
-                <Item
-                  key={index}
-                  id={id}
-                  airlineCode={airlineCode}
-                  estimatedArrival={estimatedArrival}
-                  landed={landed}
-                  onEdit={id => history.push(`/item/${id?.toString()}`)}
-                />
-              )
-            )}
+            {!checkC
+              ? data.map(
+                  ({ id, airlineCode, estimatedArrival, landed }, index) => (
+                    <Item
+                      key={index}
+                      id={id}
+                      airlineCode={airlineCode}
+                      estimatedArrival={estimatedArrival}
+                      landed={landed}
+                      onEdit={(id) => history.push(`/item/${id?.toString()}`)}
+                    />
+                  )
+                )
+              : itemsToShow?.map(
+                  ({ id, airlineCode, estimatedArrival, landed }, index) => (
+                    <Item
+                      key={index}
+                      id={id}
+                      airlineCode={airlineCode}
+                      estimatedArrival={estimatedArrival}
+                      landed={landed}
+                      onEdit={(id) => history.push(`/item/${id?.toString()}`)}
+                    />
+                  )
+                )}
           </IonList>
         }
       </IonList>
