@@ -45,13 +45,13 @@ class Item {
   }
 }
 class Flight {
-  constructor({ id, airlineCode, estimatedArrival, landed, userId, imgSrc }) {
+  constructor({ id, airlineCode, estimatedArrival, landed, userId }) {
     this.id = id;
     this.airlineCode = airlineCode;
     this.estimatedArrival = estimatedArrival;
     this.landed = landed;
     this.userId = userId;
-    this.imgSrc = imgSrc;
+    this.imgSrc = null;
     //Cluj location
     this.latitude = 46.74355462141843;
     this.longitude = 23.593913928950283;
