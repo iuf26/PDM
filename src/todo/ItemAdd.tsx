@@ -1,4 +1,4 @@
-import React, { Component, useCallback, useContext, useState } from "react";
+import React, {useCallback, useContext, useState } from "react";
 import {
   IonButton,
   IonButtons,
@@ -14,12 +14,9 @@ import {
   IonToolbar,
   IonAlert,
 } from "@ionic/react";
-import { RouteComponentProps } from "react-router";
 import { ItemContext } from "./ItemProvider";
 import { ItemProps } from "./ItemProps";
-import { Plugins } from "@capacitor/core";
-const { Network } = Plugins;
-const { Storage } = Plugins;
+import {Preferences} from '@capacitor/preferences'
 interface AddItemProps {
   netStat: boolean;
   goBack(v: boolean): any;
@@ -36,13 +33,13 @@ export const ItemAdd: React.FunctionComponent<AddItemProps> = ({
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const setItemOffline = async (value: string) => {
-    await Storage.set({
+    await Preferences.set({
       key: "add",
       value,
     });
   };
   const getAddData = async () => {
-    let res = (await Storage.get({ key: "add" })).value;
+    let res = (await Preferences.get({ key: "add" })).value;
     if (res) {
       return JSON.parse(res);
     }

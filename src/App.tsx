@@ -26,11 +26,12 @@ import { ItemProvider } from "./todo/ItemProvider";
 import { ItemAdd } from "./todo/ItemAdd";
 import { Login } from "./components/Login";
 import { AppContextProvider } from "./components/AppContext";
-import { Plugins } from "@capacitor/core";
+
 import { AuthProvider } from "./components/AuthProvider";
 import { PrivateRoute } from "./components/PrivateRoute";
-const { Network } = Plugins;
-Network.addListener("networkStatusChange", async (status) => {
+
+import { Network } from '@capacitor/network';
+Network.addListener("networkStatusChange", async (status:any) => {
   localStorage.setItem("net", status.connected.toString());
 });
 const App: React.FC = () => (

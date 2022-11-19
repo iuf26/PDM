@@ -2,9 +2,10 @@ import axios from "axios";
 import React, { useContext, useState } from "react";
 import { Redirect } from "react-router-dom";
 import { AppContext } from "./AppContext";
-import { Plugins } from "@capacitor/core";
+
 import { AuthContext } from "./AuthProvider";
-const { Storage } = Plugins;
+
+import {Preferences} from '@capacitor/preferences'
 
 export function Login() {
   const [username, setUsername] = useState("");
@@ -13,7 +14,7 @@ export function Login() {
   const { userId, setUserId } = useContext(AppContext);
   const { login, isAuthenticated } = useContext(AuthContext);
   const setStoreUserId = async (id: string) => {
-    await Storage.set({
+    await Preferences.set({
       key: "userId",
       value: id,
     });

@@ -22,11 +22,11 @@ import { InfiniteScroll } from "../components/InfiniteScroll";
 import { SearchBar } from "../components/SearchBar";
 import { AppContext } from "../components/AppContext";
 //import { Network } from '../../node_modules/@capacitor/network';
-import { Plugins } from "@capacitor/core";
+
 import { ItemAdd } from "./ItemAdd";
 import { ItemProps } from "./ItemProps";
-const { Network } = Plugins;
-const { Storage } = Plugins;
+import { Preferences } from '@capacitor/preferences';
+import {Network} from '@capacitor/network'
 
 const log = getLogger("ItemList");
 
@@ -47,12 +47,12 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
   }, [logout]);
 
   const setItemOffline = async (value: string) => {
-    await Storage.set({
+    await Preferences.set({
       key: "add",
       value,
     });
   };
-  Network.addListener("networkStatusChange", async (status) => {
+  Network.addListener("networkStatusChange", async (status:any) => {
     console.log("Network status changed in item list", status);
     if (status.connected) {
       let res = await getAddData();
@@ -75,7 +75,7 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
     setNetworkStatus(status.connected);
   });
   const getAddData = async () => {
-    let res = (await Storage.get({ key: "add" })).value;
+    let res = (await Preferences.get({ key: "add" })).value;
     if (res) {
       return JSON.parse(res);
     }
@@ -87,7 +87,7 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
     console.log("Network status:", status);
   };
   const setName = async () => {
-    await Storage.set({
+    await Preferences.set({
       key: "name",
       value: "Max",
     });
@@ -101,16 +101,16 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
   //     setCheck(!check);
   // }
   const checkName = async () => {
-    const { value } = await Storage.get({ key: "name" });
+    const { value } = await Preferences.get({ key: "name" });
 
     console.log(`Hello ${value}!`);
   };
   const checkUserId = async () => {
-    const { value } = await Storage.get({ key: "userId" });
+    const { value } = await Preferences.get({ key: "userId" });
     console.log("userdid:", value);
   };
   const removeName = async () => {
-    await Storage.remove({ key: "name" });
+    await Preferences.remove({ key: "name" });
   };
   
   useEffect(() => {

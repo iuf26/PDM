@@ -14,8 +14,10 @@ import { getLogger } from "../core";
 import { ItemContext } from "./ItemProvider";
 import { RouteComponentProps } from "react-router";
 import { ItemProps } from "./ItemProps";
-import { Plugins } from "@capacitor/core";
-const { Storage } = Plugins;
+import {Preferences } from "@capacitor/preferences";
+import {PhotoCapturer} from "../components/PhotoCapturer";
+
+
 const log = getLogger("ItemEdit");
 
 interface ItemEditProps
@@ -37,13 +39,13 @@ const ItemEdit: React.FC<ItemEditProps> = ({ history, match }) => {
     }
   }, [match.params.id, items]);
   const setItemOffline = async (value: string) => {
-    await Storage.set({
+    await Preferences.set({
       key: "add",
       value,
     });
   };
   const getAddData = async () => {
-    let res = (await Storage.get({ key: "add" })).value;
+    let res = (await Preferences.get({ key: "add" })).value;
     if (res) {
       return JSON.parse(res);
     }
@@ -97,6 +99,7 @@ const ItemEdit: React.FC<ItemEditProps> = ({ history, match }) => {
         {savingError && (
           <div>{savingError.message || "Failed to save item"}</div>
         )} */}
+        <PhotoCapturer/>
       </IonContent>
     </IonPage>
   );
