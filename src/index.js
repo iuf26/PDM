@@ -45,13 +45,16 @@ class Item {
   }
 }
 class Flight {
-  constructor({ id, airlineCode, estimatedArrival, landed, userId,imgSrc }) {
+  constructor({ id, airlineCode, estimatedArrival, landed, userId, imgSrc }) {
     this.id = id;
     this.airlineCode = airlineCode;
     this.estimatedArrival = estimatedArrival;
     this.landed = landed;
     this.userId = userId;
     this.imgSrc = imgSrc;
+    //Cluj location
+    this.latitude = 46.74355462141843;
+    this.longitude = 23.593913928950283;
   }
 }
 function getRandonString(length) {
@@ -79,7 +82,7 @@ const createRandomFlights = (nr) => {
         landed: truthValues[getRandomInt(2)],
         estimatedArrival: new Date(),
         userId: userIds[getRandomInt(2)],
-        imgSrc: '1668861336154.jpeg'
+        imgSrc: "1668861336154.jpeg",
       })
     );
     id++;
@@ -130,7 +133,7 @@ router.get("/item", (ctx) => {
   // };
 
   ctx.response.body = items;
-console.log("GET");
+  console.log("GET");
   ctx.response.status = 200;
 });
 
