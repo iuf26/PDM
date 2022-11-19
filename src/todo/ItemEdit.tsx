@@ -22,6 +22,8 @@ import { PhotoGallery } from "../components/PhotoGallery";
 import { UserPhoto } from "../hooks/usePhotoGallery";
 import Item from "./Item";
 import { ItemPicture } from "./ItemPicture";
+import { useMyLocation } from "../hooks/useMyLocation";
+import { MyMap } from "../components/MyMap";
 
 const log = getLogger("ItemEdit");
 
@@ -33,24 +35,28 @@ interface ItemEditProps
 const ItemEdit: React.FC<ItemEditProps> = ({ history, match }) => {
   const { items, saveItem } = useContext(ItemContext);
   const [airlineCode, setAirlineCode] = useState("");
-  
+
   const [openGallery, setOpenGallery] = useState(false);
   const [imgSource, setImgSource] = useState("");
-  // useEffect(() => {
-  //   if (items) {
-  //     const routeId = match.params.id || -1;
-  //     const item = items?.find((it) => it.id.toString() === routeId.toString());
-  //     console.log("****here items changes ");
-  //     setItem(item);
-  //   }
-  // }, [items, match.params.id]);
+  const myLocation = useMyLocation();
+  const { latitude: lat, longitude: lng } = myLocation.position?.coords || {};
+  const [latit, setLatit] = useState<number>();
+  const [longi, setLongi] = useState<number>();
+
+  useEffect(() => {
+    if (lat) setLatit(lat);
+  }, [lat]);
+
+  useEffect(() => {
+    if (lng) setLongi(lng);
+  }, [lng]);
+
   useEffect(() => {
     log("useEffect");
     const routeId = match.params.id || -1;
     const item = items?.find((it) => it.id.toString() === routeId.toString());
 
     if (item) {
-     
       setAirlineCode(item.airlineCode);
       if (item.imgSrc) setImgSource(item.imgSrc.toString());
     }
@@ -69,14 +75,12 @@ const ItemEdit: React.FC<ItemEditProps> = ({ history, match }) => {
     return res;
   };
   const handleSave = useCallback(async () => {
-   
     const routeId = match.params.id || -1;
     const item = items?.find((it) => it.id.toString() === routeId);
     let imgSrc = imgSource;
-    
-    let editedItem = item ? { ...item, airlineCode,imgSrc } : null;
-   
-    
+
+    let editedItem = item ? { ...item, airlineCode, imgSrc } : null;
+
     if (localStorage.getItem("net") === "false") {
       let res = await getAddData();
 
@@ -94,13 +98,9 @@ const ItemEdit: React.FC<ItemEditProps> = ({ history, match }) => {
     }
 
     if (editedItem) {
-      
       saveItem && saveItem(editedItem).then(() => history.goBack());
     }
-  }, [saveItem, airlineCode, history, items, match.params.id,imgSource]);
-
-  
-
+  }, [saveItem, airlineCode, history, items, match.params.id, imgSource]);
 
   log("render");
   return (
@@ -118,6 +118,17 @@ const ItemEdit: React.FC<ItemEditProps> = ({ history, match }) => {
             </IonToolbar>
           </IonHeader>
           <IonContent>
+            {latit && longi ? (
+              <MyMap
+                lat={latit}
+                lng={longi}
+                onMapClick={(lat: number, lng: number) => {
+                  setLatit(lat);
+                  setLongi(lng);
+                }}
+                onMarkerClick={log("onMarker")}
+              />
+            ) : null}
             <IonInput
               value={airlineCode}
               onIonChange={(e) => {
