@@ -26,6 +26,7 @@ export const MyMap = compose<MyMapProps, any>(
   withGoogleMap
 )((props) => {
   return (
+    
     <GoogleMap
       defaultZoom={8}
       defaultCenter={{ lat: props.lat, lng: props.lng }}

@@ -49,7 +49,7 @@ export function SearchBar() {
             estimatedArrival={estimatedArrival}
             landed={landed}
             onEdit={(id) => id}
-            imgSrc = {imgSrc}
+            
 
           />
         ))}

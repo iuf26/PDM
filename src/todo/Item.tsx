@@ -43,7 +43,7 @@ const Item: React.FC<ItemPropsExt> = ({
         ).toLocaleString(DateTime.DATETIME_MED)}
       </IonLabel>
       <IonLabel>{landed.toString()}</IonLabel>
-      {imgSrc ? <IonImg src={imgRealSource} /> : null}
+      {imgSrc ? <IonImg src={imgRealSource} /> : <p>No picture to display</p>}
     </IonItem>
   );
 };

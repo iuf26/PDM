@@ -1,4 +1,4 @@
-import React, {useCallback, useContext, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import {
   IonButton,
   IonButtons,
@@ -16,14 +16,20 @@ import {
 } from "@ionic/react";
 import { ItemContext } from "./ItemProvider";
 import { ItemProps } from "./ItemProps";
-import {Preferences} from '@capacitor/preferences'
+import { Preferences } from "@capacitor/preferences";
+import { useMyLocation } from "../hooks/useMyLocation";
+import { MyMap } from "../components/MyMap";
+import { ItemPicture } from "./ItemPicture";
+import { PhotoGallery } from "../components/PhotoGallery";
 interface AddItemProps {
   netStat: boolean;
   goBack(v: boolean): any;
+  close:any;
 }
 export const ItemAdd: React.FunctionComponent<AddItemProps> = ({
   netStat,
   goBack,
+ close
 }) => {
   const { items, saveItem } = useContext(ItemContext);
   const [airlineCode, setAirlineCode] = useState("");
@@ -32,6 +38,14 @@ export const ItemAdd: React.FunctionComponent<AddItemProps> = ({
   const [eta, setEta] = useState(new Date());
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
+  //const myLocation = useMyLocation();
+  //const { latitude: lat, longitude: lng } = myLocation.position?.coords || {};
+  const [latit, setLatit] = useState<number>(46.74355462141843);
+  const [longi, setLongi] = useState<number>(23.593913928950283);
+  const[imgSource,setImgSource] = useState()
+  const [openGallery, setOpenGallery] = useState(false);
+  
+
   const setItemOffline = async (value: string) => {
     await Preferences.set({
       key: "add",
@@ -51,6 +65,9 @@ export const ItemAdd: React.FunctionComponent<AddItemProps> = ({
       landed,
       estimatedArrival: eta,
       airlineCode,
+      latitude:latit,
+      longitude:longi,
+      imgSrc:imgSource
     };
     if (netStat) {
       console.log("in here");
@@ -66,10 +83,11 @@ export const ItemAdd: React.FunctionComponent<AddItemProps> = ({
         res.push(item);
       }
       const dd = items;
-      if(dd){
-      dd.unshift(item)}
+      if (dd) {
+        dd.unshift(item);
+      }
       await setItemOffline(JSON.stringify(dd));
-      alert("Your data won't be sended to the server ,you are in offline mode")
+      alert("Your data won't be sended to the server ,you are in offline mode");
     }
     goBack(false);
     //
@@ -82,11 +100,24 @@ export const ItemAdd: React.FunctionComponent<AddItemProps> = ({
           <IonTitle>Add item</IonTitle>
           <IonButtons slot="end">
             <IonButton onClick={handleSave}>Save</IonButton>
+            <IonButton onClick={() => close(false)}>Close</IonButton>
           </IonButtons>
         </IonToolbar>
       </IonHeader>
       <IonContent>
         <IonButton>Network status:{netStat ? "online" : "offline"}</IonButton>
+        {latit && longi ? (
+          <MyMap
+            lat={latit}
+            lng={longi}
+            onMapClick={(lat: number, lng: number) => {
+              setLatit(lat);
+              setLongi(lng);
+            }}
+            onMarkerClick={() => 3}
+          />
+        ) : null}
+
         <IonInput onIonChange={(e) => setAirlineCode(e.detail.value || "")}>
           AirlineCode:
         </IonInput>
@@ -152,7 +183,16 @@ export const ItemAdd: React.FunctionComponent<AddItemProps> = ({
             }}
           ></IonDatetime>
         </IonItem>
-        <IonAlert
+        <IonItem>
+          {imgSource !== "" ? <ItemPicture src={imgSource} /> : <div>No image to display</div>}
+          <IonButton onClick={() => setOpenGallery(true)}>
+              Upload Photo
+            </IonButton>
+
+            {openGallery ? <PhotoGallery close={setOpenGallery} setPhoto={setImgSource} /> : null}
+
+        </IonItem>
+         <IonAlert
           isOpen={showAlert}
           onDidDismiss={() => setShowAlert(false)}
           header="Alert"

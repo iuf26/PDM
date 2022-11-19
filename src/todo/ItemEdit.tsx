@@ -24,6 +24,8 @@ import Item from "./Item";
 import { ItemPicture } from "./ItemPicture";
 import { useMyLocation } from "../hooks/useMyLocation";
 import { MyMap } from "../components/MyMap";
+import { CreateAnimation, Animation } from '@ionic/react';
+
 
 const log = getLogger("ItemEdit");
 

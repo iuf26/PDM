@@ -1,6 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Redirect, RouteComponentProps } from "react-router";
 import {
+  createAnimation,
+  CreateAnimation,
   IonButton,
   IonCheckbox,
   IonContent,
@@ -10,6 +12,7 @@ import {
   IonIcon,
   IonList,
   IonLoading,
+  IonModal,
   IonPage,
   IonTitle,
   IonToolbar,
@@ -25,12 +28,13 @@ import { AppContext } from "../components/AppContext";
 
 import { ItemAdd } from "./ItemAdd";
 import { ItemProps } from "./ItemProps";
-import { Preferences } from '@capacitor/preferences';
-import {Network} from '@capacitor/network'
+import { Preferences } from "@capacitor/preferences";
+import { Network } from "@capacitor/network";
 import { base64FromPath } from "../hooks/usePhotoGallery";
 import { Directory, Filesystem } from "@capacitor/filesystem";
 import { MyMap } from "../components/MyMap";
 import { useMyLocation } from "../hooks/useMyLocation";
+import { Modal } from "./Modal";
 
 const log = getLogger("ItemList");
 
@@ -40,12 +44,12 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
   const [logout, setLogout] = useState(false);
   const [networkStatus, setNetworkStatus] = useState(true);
   const [itemAddView, setItemAddView] = useState(false);
-  const [stop,setStop] = useState(false);
-  const [filter,setFilter] = useState(false);
-  const [check,setCheck] = useState(false);
-  const [elemsToDisplay,setElemsToDisplay] = useState<ItemProps[]>()
- 
-  
+  const [stop, setStop] = useState(false);
+  const [filter, setFilter] = useState(false);
+  const [check, setCheck] = useState(false);
+  const [elemsToDisplay, setElemsToDisplay] = useState<ItemProps[]>();
+  const [playAddAnim, setPlayAddAnim] = useState(true);
+
   useEffect(() => {
     console.log(logout);
   }, [logout]);
@@ -56,16 +60,14 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
       value,
     });
   };
-  Network.addListener("networkStatusChange", async (status:any) => {
+  Network.addListener("networkStatusChange", async (status: any) => {
     console.log("Network status changed in item list", status);
     if (status.connected) {
       let res = await getAddData();
       if (res && res.length > 0) {
         if (saveItem) {
-          if(!stop){
-          
+          if (!stop) {
             saveItem(res[0]);
-          
 
             await setItemOffline(JSON.stringify([]));
             setStop(true);
@@ -116,7 +118,31 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
   const removeName = async () => {
     await Preferences.remove({ key: "name" });
   };
-  
+  const enterAnimation = (baseEl:any, opts:any) => {
+    console.log(baseEl,"9099909");
+   
+    const root = baseEl.shadowRoot;
+
+    const backdropAnimation = createAnimation()
+      .addElement(opts.enteringEl)
+      .fromTo("opacity", "0.01", "var(--backdrop-opacity)");
+
+    const wrapperAnimation = createAnimation()
+      .addElement(root.querySelector(".modal-wrapper")!)
+      .keyframes([
+        { offset: 0, opacity: "0", transform: "scale(0)" },
+        { offset: 1, opacity: "0.99", transform: "scale(1)" },
+      ]);
+
+    return createAnimation()
+      .addElement(baseEl)
+      .easing("ease-out")
+      .duration(500)
+      .addAnimation([backdropAnimation, wrapperAnimation]);
+  };
+  const leaveAnimation = (baseEl: any,opts:any) => {
+    return enterAnimation(baseEl,opts).direction("reverse");
+  };
   useEffect(() => {
     checkUserId();
   }, [networkStatus]);
@@ -125,7 +151,25 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
       {!logout ? (
         localStorage.getItem("token") ? (
           itemAddView ? (
-            <ItemAdd netStat={networkStatus} goBack={setItemAddView} />
+            // <IonContent>
+            //   <IonModal
+            //     isOpen={itemAddView}
+            //     enterAnimation={enterAnimation}
+            //     leaveAnimation={leaveAnimation}
+            //   >
+            //     <ItemAdd
+            //       netStat={networkStatus}
+            //       goBack={setItemAddView}
+            //       close={setItemAddView}
+            //     />
+            //   </IonModal>
+            // </IonContent>
+            <ItemAdd
+                  netStat={networkStatus}
+                  goBack={setItemAddView}
+                  close={setItemAddView}
+                />
+     
           ) : (
             <IonPage>
               <IonHeader>
@@ -134,16 +178,34 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
                 </IonToolbar>
               </IonHeader>
               <IonContent>
-              
-                <IonButton
-                  onClick={() => {
-                    localStorage.removeItem("token");
-                    localStorage.removeItem("userId");
-                    setLogout(true);
+                <CreateAnimation
+                  duration={2000}
+                  beforeStyles={{
+                    opacity: 0.2,
                   }}
+                  afterStyles={{
+                    background: "rgba(0, 255, 0, 0.5)",
+                  }}
+                  afterClearStyles={["opacity"]}
+                  keyframes={[
+                    { offset: 0, transform: "scale(1)" },
+                    { offset: 0.5, transform: "scale(1.5)" },
+                    { offset: 1, transform: "scale(1)" },
+                  ]}
+                  iterations={Infinity}
+                  play={true}
                 >
-                  Log out
-                </IonButton>
+                  <IonButton
+                    onClick={() => {
+                      localStorage.removeItem("token");
+                      localStorage.removeItem("userId");
+                      setLogout(true);
+                    }}
+                  >
+                    Log out
+                  </IonButton>
+                </CreateAnimation>
+
                 {/* <label>Show only landed </label>
                 <IonCheckbox onClick={() => setOnlyLanded()}></IonCheckbox> */}
                 <IonButton>
@@ -158,11 +220,25 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
                 {fetchingError && (
                   <div>{fetchingError.message || "Failed to fetch items"}</div>
                 )}
-                <IonFab vertical="bottom" horizontal="end" slot="fixed">
-                  <IonFabButton onClick={() => setItemAddView(true)}>
-                    <IonIcon icon={add} />
-                  </IonFabButton>
-                </IonFab>
+                <CreateAnimation
+                  duration={4000}
+                  iterations={Infinity}
+                  fromTo={[
+                    {
+                      property: "transform",
+                      fromValue: "translateX(0px)",
+                      toValue: "translateX(-100px)",
+                    },
+                    { property: "opacity", fromValue: "1", toValue: "0.2" },
+                  ]}
+                  play={true}
+                >
+                  <IonFab vertical="bottom" horizontal="end" slot="fixed">
+                    <IonFabButton onClick={() => setItemAddView(true)}>
+                      <IonIcon icon={add} />
+                    </IonFabButton>
+                  </IonFab>
+                </CreateAnimation>
               </IonContent>
             </IonPage>
           )
@@ -177,4 +253,3 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
 };
 
 export default ItemList;
-
