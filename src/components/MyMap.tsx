@@ -36,7 +36,7 @@ export const MyMap = compose<MyMapProps, any>(
       <Marker
         position={{ lat: props.lat, lng: props.lng }}
         onClick={() => {
-          console.log("helo**marker*");
+         
         }}
       />
     </GoogleMap>

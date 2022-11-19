@@ -4,5 +4,7 @@ export interface ItemProps {
   landed: boolean;
   estimatedArrival: Date;
   userId?: number;
-  imgSrc?:string
+  imgSrc?:string;
+  longitude?:number,
+  latitude?:number
 }

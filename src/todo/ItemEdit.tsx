@@ -38,18 +38,11 @@ const ItemEdit: React.FC<ItemEditProps> = ({ history, match }) => {
 
   const [openGallery, setOpenGallery] = useState(false);
   const [imgSource, setImgSource] = useState("");
-  const myLocation = useMyLocation();
-  const { latitude: lat, longitude: lng } = myLocation.position?.coords || {};
+  // const myLocation = useMyLocation();
+  // const { latitude: lat, longitude: lng } = myLocation.position?.coords || {};
   const [latit, setLatit] = useState<number>();
   const [longi, setLongi] = useState<number>();
 
-  useEffect(() => {
-    if (lat) setLatit(lat);
-  }, [lat]);
-
-  useEffect(() => {
-    if (lng) setLongi(lng);
-  }, [lng]);
 
   useEffect(() => {
     log("useEffect");
@@ -58,6 +51,8 @@ const ItemEdit: React.FC<ItemEditProps> = ({ history, match }) => {
 
     if (item) {
       setAirlineCode(item.airlineCode);
+      setLongi(item.longitude);
+      setLatit(item.latitude)
       if (item.imgSrc) setImgSource(item.imgSrc.toString());
     }
   }, [match.params.id, items]);
@@ -78,8 +73,9 @@ const ItemEdit: React.FC<ItemEditProps> = ({ history, match }) => {
     const routeId = match.params.id || -1;
     const item = items?.find((it) => it.id.toString() === routeId);
     let imgSrc = imgSource;
-
-    let editedItem = item ? { ...item, airlineCode, imgSrc } : null;
+    const longitude = longi;
+    const latitude = latit;
+    let editedItem = item ? { ...item, airlineCode, imgSrc,longitude,latitude } : null;
 
     if (localStorage.getItem("net") === "false") {
       let res = await getAddData();
@@ -100,7 +96,7 @@ const ItemEdit: React.FC<ItemEditProps> = ({ history, match }) => {
     if (editedItem) {
       saveItem && saveItem(editedItem).then(() => history.goBack());
     }
-  }, [saveItem, airlineCode, history, items, match.params.id, imgSource]);
+  }, [saveItem, airlineCode, history, items, match.params.id, imgSource,latit,longi]);
 
   log("render");
   return (
@@ -137,6 +133,11 @@ const ItemEdit: React.FC<ItemEditProps> = ({ history, match }) => {
             >
               New Airline Code:
             </IonInput>
+              <div>My location is</div>
+              <div>Longitude: {longi}</div>
+              <div>Latitude: {latit}</div>
+
+
             <IonLabel>Current Photo: </IonLabel>
             {imgSource !== "" ? <ItemPicture src={imgSource} /> : null}
             <IonButton onClick={() => setOpenGallery(true)}>
