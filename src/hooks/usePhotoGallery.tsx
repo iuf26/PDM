@@ -13,7 +13,7 @@ import { Directory, Filesystem } from "@capacitor/filesystem";
 
 export interface UserPhoto {
   filepath?: string;
-  webviewPath?: string;
+  webviewPath: string;
   filename: string;
 }
 
@@ -36,6 +36,11 @@ export async function base64FromPath(path: string): Promise<string> {
 
 export function usePhotoGallery() {
   const [photos, setPhotos] = useState<UserPhoto[]>([]);
+
+  let toSendS = localStorage.getItem("userPhotos");
+  let objsPhoto = [];
+  if (toSendS) objsPhoto = JSON.parse(toSendS);
+
   const takePhoto = async () => {
     const photo = await Camera.getPhoto({
       resultType: CameraResultType.Uri,
@@ -44,24 +49,32 @@ export function usePhotoGallery() {
     });
     console.log(photo.webPath);
     const fileName = new Date().getTime() + ".jpeg";
-    let oldPhotos =   (await Preferences.get({ key: "userPhotos" })).value;
-    let  oldObj;
+    let oldPhotos = localStorage.getItem("userPhotos");
+    let oldObj;
     if (oldPhotos) {
-       oldObj  = JSON.parse(oldPhotos);
-     
+      oldObj = JSON.parse(oldPhotos);
     }
-    const newPhotos = [
-      {
-        filename: fileName,
-        webviewPath: photo.webPath,
-      },
-      ...oldObj,
-    ];
+    let newPhotos;
+
+    if (oldObj) {
+      newPhotos = [
+        {
+          filename: fileName,
+          webviewPath: photo.webPath,
+        },
+        ...oldObj,
+      ];
+    } else {
+      newPhotos = [
+        {
+          filename: fileName,
+          webviewPath: photo.webPath,
+        },
+      ];
+    }
     savePicture(photo, fileName);
-    Preferences.set({
-      key: "userPhotos",
-      value: JSON.stringify(newPhotos),
-    });
+
+    localStorage.setItem("userPhotos", JSON.stringify(newPhotos));
     setPhotos(newPhotos);
   };
 
@@ -77,5 +90,6 @@ export function usePhotoGallery() {
   return {
     takePhoto,
     photos,
+    objsPhoto,
   };
 }

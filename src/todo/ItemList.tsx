@@ -27,6 +27,8 @@ import { ItemAdd } from "./ItemAdd";
 import { ItemProps } from "./ItemProps";
 import { Preferences } from '@capacitor/preferences';
 import {Network} from '@capacitor/network'
+import { base64FromPath } from "../hooks/usePhotoGallery";
+import { Directory, Filesystem } from "@capacitor/filesystem";
 
 const log = getLogger("ItemList");
 
@@ -40,8 +42,7 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
   const [filter,setFilter] = useState(false);
   const [check,setCheck] = useState(false);
   const [elemsToDisplay,setElemsToDisplay] = useState<ItemProps[]>()
-  
-
+ 
   useEffect(() => {
     console.log(logout);
   }, [logout]);
@@ -173,3 +174,4 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
 };
 
 export default ItemList;
+

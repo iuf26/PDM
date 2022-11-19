@@ -12,6 +12,7 @@ import Item from "../todo/Item";
 
 export function SearchBar() {
   const { items } = useContext(ItemContext);
+  
   let [results, setResults] = useState<ItemProps[]>([]);
 
   const handleChange = (ev: Event) => {
@@ -40,7 +41,7 @@ export function SearchBar() {
       ></IonSearchbar>
 
       <IonList>
-        {results.map(({ id, airlineCode, estimatedArrival, landed }, index) => (
+        {results.map(({ id, airlineCode, estimatedArrival, landed,imgSrc }, index) => (
           <Item
             key={index}
             id={id}
@@ -48,6 +49,8 @@ export function SearchBar() {
             estimatedArrival={estimatedArrival}
             landed={landed}
             onEdit={(id) => id}
+            imgSrc = {imgSrc}
+
           />
         ))}
       </IonList>

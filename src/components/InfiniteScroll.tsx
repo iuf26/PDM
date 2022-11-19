@@ -19,6 +19,7 @@ import { ItemContext } from "../todo/ItemProvider";
 import { ItemProps } from "../todo/ItemProps";
 import Item from "../todo/Item";
 import { Redirect } from "react-router-dom";
+import { Directory, Filesystem } from "@capacitor/filesystem";
 export function InfiniteScroll({ history }: any) {
   const { items } = useContext(ItemContext);
   const [data, setData] = useState<ItemProps[]>([]);
@@ -37,6 +38,7 @@ export function InfiniteScroll({ history }: any) {
   }
     setCheckC(!checkC);
   };
+
   const pushData = () => {
     if (items) {
       let max;
@@ -57,17 +59,8 @@ export function InfiniteScroll({ history }: any) {
 
   useEffect(() => {
     if (items) {
-      // console.log("items changed",items[items.length - 1]);
-      // if (data.length > 0) {
-      //   const elem = items[items.length - 1];
-      //   const newData = data;
-      //   newData.push(elem);
-      //   // for (let i = min; i < max; i++) {
-      //   //   newData.push(items[i]);
-      //   // }
-      //   console.log(newData);
-      //   setData(newData);
-      // } else {
+      
+       
       if (data.length > 0) {
         let copy = [...data];
         copy.pop();
@@ -100,7 +93,7 @@ export function InfiniteScroll({ history }: any) {
           <IonList>
             {!checkC
               ? data.map(
-                  ({ id, airlineCode, estimatedArrival, landed }, index) => (
+                  ({ id, airlineCode, estimatedArrival, landed,imgSrc }, index) => (
                     <Item
                       key={index}
                       id={id}
@@ -108,11 +101,12 @@ export function InfiniteScroll({ history }: any) {
                       estimatedArrival={estimatedArrival}
                       landed={landed}
                       onEdit={(id) => history.push(`/item/${id?.toString()}`)}
+                      imgSrc = {imgSrc}
                     />
                   )
                 )
               : itemsToShow?.map(
-                  ({ id, airlineCode, estimatedArrival, landed }, index) => (
+                  ({ id, airlineCode, estimatedArrival, landed,imgSrc }, index) => (
                     <Item
                       key={index}
                       id={id}
@@ -120,6 +114,7 @@ export function InfiniteScroll({ history }: any) {
                       estimatedArrival={estimatedArrival}
                       landed={landed}
                       onEdit={(id) => history.push(`/item/${id?.toString()}`)}
+                      imgSrc = {imgSrc}
                     />
                   )
                 )}
