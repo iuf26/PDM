@@ -69,6 +69,7 @@ export const ItemAdd: React.FunctionComponent<AddItemProps> = ({
       longitude:longi,
       imgSrc:imgSource
     };
+    console.log(item);
     if (netStat) {
       console.log("in here");
       saveItem && saveItem(item);
@@ -91,7 +92,7 @@ export const ItemAdd: React.FunctionComponent<AddItemProps> = ({
     }
     goBack(false);
     //
-  }, [saveItem, airlineCode, landed, eta, id]);
+  }, [saveItem, airlineCode, landed, eta, id,imgSource,goBack, items, latit, longi]);
 
   return (
     <IonPage>

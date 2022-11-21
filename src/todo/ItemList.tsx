@@ -118,13 +118,10 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
   const removeName = async () => {
     await Preferences.remove({ key: "name" });
   };
-  const enterAnimation = (baseEl:any, opts:any) => {
-    console.log(baseEl,"9099909");
-   
-    const root = baseEl.shadowRoot;
-
+  const enterAnimation = (baseEl: any) => {
+    const root = baseEl;
     const backdropAnimation = createAnimation()
-      .addElement(opts.enteringEl)
+      .addElement(root.querySelector("ion-backdrop")!)
       .fromTo("opacity", "0.01", "var(--backdrop-opacity)");
 
     const wrapperAnimation = createAnimation()
@@ -140,8 +137,9 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
       .duration(500)
       .addAnimation([backdropAnimation, wrapperAnimation]);
   };
-  const leaveAnimation = (baseEl: any,opts:any) => {
-    return enterAnimation(baseEl,opts).direction("reverse");
+
+  const leaveAnimation = (baseEl: any) => {
+    return enterAnimation(baseEl).direction("reverse");
   };
   useEffect(() => {
     checkUserId();
@@ -151,25 +149,24 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
       {!logout ? (
         localStorage.getItem("token") ? (
           itemAddView ? (
-            // <IonContent>
-            //   <IonModal
-            //     isOpen={itemAddView}
-            //     enterAnimation={enterAnimation}
-            //     leaveAnimation={leaveAnimation}
-            //   >
-            //     <ItemAdd
-            //       netStat={networkStatus}
-            //       goBack={setItemAddView}
-            //       close={setItemAddView}
-            //     />
-            //   </IonModal>
-            // </IonContent>
-            <ItemAdd
+            <>
+              <IonModal
+                isOpen={true}
+                enterAnimation={enterAnimation}
+                leaveAnimation={leaveAnimation}
+              >
+                <ItemAdd
                   netStat={networkStatus}
                   goBack={setItemAddView}
                   close={setItemAddView}
                 />
-     
+              </IonModal>
+            </>
+            // <ItemAdd
+            //   netStat={networkStatus}
+            //   goBack={setItemAddView}
+            //   close={setItemAddView}
+            // />
           ) : (
             <IonPage>
               <IonHeader>
