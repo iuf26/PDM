@@ -141,7 +141,7 @@ const ItemEdit: React.FC<ItemEditProps> = ({ history, match }) => {
 
 
             <IonLabel>Current Photo: </IonLabel>
-            {imgSource !== "" ? <ItemPicture src={imgSource} /> : null}
+            {imgSource !== "" ? <ItemPicture src={imgSource} /> : <IonImg src={"assets/images/flower.jpg"} />}
             <IonButton onClick={() => setOpenGallery(true)}>
               Upload Photo
             </IonButton>

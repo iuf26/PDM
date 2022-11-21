@@ -35,8 +35,10 @@ import { animationBuilder } from "./hooks/animations";
 Network.addListener("networkStatusChange", async (status:any) => {
   localStorage.setItem("net", status.connected.toString());
 });
+
+
 const App: React.FC = () => (
- 
+  
     <IonApp>
       <IonReactRouter>
         <IonRouterOutlet animation={animationBuilder}>
