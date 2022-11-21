@@ -59,17 +59,18 @@ export function InfiniteScroll({ history }: any) {
 
   useEffect(() => {
     if (items) {
+      console.log("items iulia");
       
        
       if (data.length > 0) {
         let copy = [...data];
         copy.pop();
         let res = [...copy, items[0]];
-
+        console.log("data:",data);
         setData(res);
         return;
       }
-
+      
       pushData();
     }
   }, [items]);

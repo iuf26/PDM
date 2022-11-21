@@ -49,6 +49,7 @@ const ItemList: React.FC<RouteComponentProps> = ({ history }) => {
   const [check, setCheck] = useState(false);
   const [elemsToDisplay, setElemsToDisplay] = useState<ItemProps[]>();
   const [playAddAnim, setPlayAddAnim] = useState(true);
+  
 
   useEffect(() => {
     console.log(logout);

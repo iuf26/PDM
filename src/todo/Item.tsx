@@ -32,7 +32,7 @@ const Item: React.FC<ItemPropsExt> = ({
       };
       loadSaved();
     }
-  }, []);
+  }, [imgSrc]);
   return (
     <IonItem onClick={handleEdit}>
       <IonLabel>{id.toString()}</IonLabel>
