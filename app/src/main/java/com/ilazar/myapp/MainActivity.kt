@@ -21,9 +21,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             Log.d(TAG, "onCreate")
+
             MyApp {
                 MyNetworkStatus()
                 MyAppNavHost()
+                MyJobs()
 
             }
 

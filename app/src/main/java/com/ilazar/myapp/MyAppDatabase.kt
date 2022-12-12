@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import com.ilazar.myapp.todo.data.Item
 import com.ilazar.myapp.todo.data.local.ItemDao
 
-@Database(entities = arrayOf(Item::class), version = 9)
+@Database(entities = arrayOf(Item::class), version = 10)
 abstract class MyAppDatabase : RoomDatabase() {
     abstract fun itemDao(): ItemDao
 
