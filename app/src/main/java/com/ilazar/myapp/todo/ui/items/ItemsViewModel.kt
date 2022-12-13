@@ -21,7 +21,7 @@ sealed interface ItemsUiState {
     object Loading : ItemsUiState
 }
 
-class ItemsViewModel(private val itemRepository: ItemRepository) : ViewModel() {
+class ItemsViewModel(private val itemRepository: ItemRepository ) : ViewModel() {
     var uiState: ItemsUiState by mutableStateOf(ItemsUiState.Loading)
         private set
 

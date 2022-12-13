@@ -25,7 +25,6 @@ class MainActivity : ComponentActivity() {
             MyApp {
                 MyNetworkStatus()
                 MyAppNavHost()
-                MyJobs()
 
             }
 

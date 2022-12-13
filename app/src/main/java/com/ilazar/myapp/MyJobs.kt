@@ -47,6 +47,7 @@ class MyJobsViewModel(application: Application) : AndroidViewModel(application) 
                 .build()
             val myPeriodicWork = PeriodicWorkRequestBuilder<MyWorker>(1, TimeUnit.MINUTES)
             val myWork = OneTimeWorkRequest.Builder(MyWorker::class.java)
+                .setConstraints(constraints)
                 .setInputData(inputData)
                 .build()
             workId = myWork.id

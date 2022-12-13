@@ -1,5 +1,6 @@
 package com.ilazar.myapp.todo.ui.item
 
+import android.app.Application
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -10,12 +11,15 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.work.*
 import com.ilazar.myapp.MyApplication
 import com.ilazar.myapp.core.TAG
 import com.ilazar.myapp.todo.data.Item
 import com.ilazar.myapp.todo.data.ItemRepository
+import com.ilazar.myapp.util.MyWorker
 import com.ilazar.myapp.util.showSimpleNotification
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 
 data class ItemUiState(
     val isLoading: Boolean = false,
@@ -27,14 +31,17 @@ data class ItemUiState(
     val savingError: Throwable? = null,
 )
 
-class ItemViewModel(private val itemId: String?, private val itemRepository: ItemRepository) :
+class ItemViewModel(private val itemId: String?, private val itemRepository: ItemRepository,private val application:Application) :
     ViewModel() {
+    private var workManager: WorkManager = WorkManager.getInstance(application)
     var uiState: ItemUiState by mutableStateOf(ItemUiState(isLoading = true))
         private set
 
 
 
+
     init {
+
         Log.d(TAG, "init")
         if (itemId != null) {
             loadItem()
@@ -64,10 +71,50 @@ class ItemViewModel(private val itemId: String?, private val itemRepository: Ite
                 uiState = uiState.copy(isSaving = true, savingError = null)
                 val item = uiState.item?.copy(text = text, passengers = passengers)
                 if (itemId == null) {
+                    val constraints = Constraints.Builder()
+                        .setRequiredNetworkType(NetworkType.CONNECTED)
+                        .build()
+                    val inputData = Data.Builder().putString("action","add")
+                        .putString("id", item?._id)
+                        .putString("text",text)
+                        .putInt("passengers",passengers)
+                        .build()
+                    val myWork = OneTimeWorkRequest.Builder(MyWorker::class.java)
+                        .setConstraints(constraints)
+                        .setInputData(inputData)
+                        .build()
 
-                    itemRepository.save(item!!,netStat)
+                    workManager.apply {
+                        enqueue(myWork)
+                    }
+                    if (item != null) {
+                        itemRepository.handleItemCreated(item)
+                    }
                 } else {
-                    itemRepository.update(item!!)
+
+                    val constraints = Constraints.Builder()
+                        .setRequiredNetworkType(NetworkType.CONNECTED)
+                        .build()
+                    val inputData = Data.Builder().putString("action","update")
+                        .putString("id", item?._id)
+                        .putString("text",text)
+                        .putInt("passengers",passengers)
+                        .build()
+                    val myWork = OneTimeWorkRequest.Builder(MyWorker::class.java)
+                        .setConstraints(constraints)
+                        .setInputData(inputData)
+                        .build()
+
+
+                    workManager.apply {
+                        enqueue(myWork)
+                    }
+
+                    Log.d(TAG, "worker should work");
+                  //  itemRepository.update(item!!)
+                    if (item != null) {
+                        itemRepository.updateInLocalStorage(item)
+                    }
                 }
                 Log.d(TAG, "saveOrUpdateItem succeeded");
                 uiState = uiState.copy(isSaving = false, savingCompleted = true)
@@ -84,7 +131,8 @@ class ItemViewModel(private val itemId: String?, private val itemRepository: Ite
             initializer {
                 val app =
                     (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as MyApplication)
-                ItemViewModel(itemId, app.container.itemRepository)
+
+                ItemViewModel(itemId, app.container.itemRepository,app)
             }
         }
     }

@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ilazar.myapp.core.TAG
+import com.ilazar.myapp.core.data.remote.Api
 import com.ilazar.myapp.todo.data.local.ItemDao
 import com.ilazar.myapp.todo.data.remote.ItemEvent
 import com.ilazar.myapp.todo.data.remote.ItemService
@@ -30,6 +31,7 @@ class ItemRepository(
 
     init {
         Log.d(TAG, "init")
+
     }
    suspend fun saveOffline(){
 
@@ -95,12 +97,17 @@ class ItemRepository(
     }
 
     suspend fun update(item: Item): Item {
-        Log.d(TAG, "update $item...")
+
         val updatedItem = itemService.update(item._id, item)
         Log.d(TAG, "update $item succeeded")
         handleItemUpdated(updatedItem)
         return updatedItem
     }
+
+    suspend fun updateInLocalStorage(item :Item){
+        itemDao.update(item)
+    }
+
 
     suspend fun save(item: Item,netStat: Boolean): Item {
         Log.d(TAG, "save $item...")
@@ -128,7 +135,7 @@ class ItemRepository(
         itemDao.update(item)
     }
 
-    private suspend fun handleItemCreated(item: Item) {
+    public suspend fun handleItemCreated(item: Item) {
         Log.d(TAG, "handleItemCreated...")
         itemDao.insert(item)
     }
