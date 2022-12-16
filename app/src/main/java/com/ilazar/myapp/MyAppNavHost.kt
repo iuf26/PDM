@@ -52,6 +52,9 @@ fun MyAppNavHost() {
                     navController.navigate(authRoute) {
                         popUpTo(0)
                     }
+                },
+            onCameraOpen = {
+                navController.navigate("camera")
                 }
             )
         }
@@ -64,6 +67,11 @@ fun MyAppNavHost() {
                 itemId = it.arguments?.getString("id"),
                 onClose = { onCloseItem() }
             )
+
+
+        }
+        composable(route = "camera") {
+            MainContentCamera()
         }
         composable(route = "$itemsRoute-new")
         {

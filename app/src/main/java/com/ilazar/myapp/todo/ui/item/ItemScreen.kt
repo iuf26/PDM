@@ -1,6 +1,8 @@
 package com.ilazar.myapp.todo.ui
 
 import android.app.Application
+import android.content.Intent
+import android.provider.MediaStore
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -31,6 +33,7 @@ fun ItemScreen(itemId: String?, onClose: () -> Unit) {
         )
     )
     val context = LocalContext.current
+
 //    var passengers by rememberSaveable { mutableStateOf(itemUiState.item?.passengers?.toString(): "") }
 //    Log.d("ItemScreen", "recompose, text = $text")
 
@@ -98,6 +101,7 @@ fun ItemScreen(itemId: String?, onClose: () -> Unit) {
                 label = { Text("Passangers") },
 
             )
+
         }
 
 

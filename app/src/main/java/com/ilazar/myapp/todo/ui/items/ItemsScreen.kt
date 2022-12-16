@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.ThumbUp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
@@ -16,7 +17,7 @@ import com.ilazar.myapp.util.showSimpleNotification
 import com.ilazar.myservices.ui.MyNetworkStatusViewModel
 
 @Composable
-fun ItemsScreen(onItemClick: (id: String?) -> Unit, onAddItem: () -> Unit, onLogout: () -> Unit) {
+fun ItemsScreen(onItemClick: (id: String?) -> Unit, onAddItem: () -> Unit, onLogout: () -> Unit,onCameraOpen : () -> Unit) {
     Log.d("ItemsScreen", "recompose")
     val itemsViewModel = viewModel<ItemsViewModel>(factory = ItemsViewModel.Factory)
     val itemsUiState = itemsViewModel.uiState
@@ -38,6 +39,12 @@ fun ItemsScreen(onItemClick: (id: String?) -> Unit, onAddItem: () -> Unit, onLog
                 title = { Text("Items " + " Is online: ${myNewtworkStatusViewModel.uiState}") },
                 actions = {
                     Button(onClick = onLogout) { Text("Logout") }
+                    Button(
+                        onClick = {
+                            Log.d("ItemsScreen", "CAMERA")
+                            onCameraOpen()
+                        },
+                    ) { Icon(Icons.Rounded.ThumbUp, "Camera") }
                 }
             )
         },
@@ -48,7 +55,9 @@ fun ItemsScreen(onItemClick: (id: String?) -> Unit, onAddItem: () -> Unit, onLog
                     onAddItem()
                 },
             ) { Icon(Icons.Rounded.Add, "Add") }
-        }
+
+        },
+
     ) {
         when (itemsUiState) {
 
@@ -63,5 +72,5 @@ fun ItemsScreen(onItemClick: (id: String?) -> Unit, onAddItem: () -> Unit, onLog
 @Preview
 @Composable
 fun PreviewItemsScreen() {
-    ItemsScreen(onItemClick = {}, onAddItem = {}, onLogout = {})
+    ItemsScreen(onItemClick = {}, onAddItem = {}, onLogout = {}, onCameraOpen = {})
 }

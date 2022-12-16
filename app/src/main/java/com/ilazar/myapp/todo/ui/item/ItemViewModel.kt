@@ -1,6 +1,8 @@
 package com.ilazar.myapp.todo.ui.item
 
 import android.app.Application
+import android.content.Intent
+import android.provider.MediaStore
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -62,6 +64,10 @@ class ItemViewModel(private val itemId: String?, private val itemRepository: Ite
         }
     }
 
+    fun onImageToTake(){
+        val takePhotoIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        application.startActivity(takePhotoIntent);
+    }
 
     fun saveOrUpdateItem(text: String,passengers:Int,netStat: Boolean) {
         Log.d("Iulia see",passengers.toString())
