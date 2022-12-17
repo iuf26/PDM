@@ -4,13 +4,18 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
+import android.widget.ImageView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.ContentView
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -104,12 +109,15 @@ fun PreviewMyApp() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.P)
 @SuppressLint("SimpleDateFormat")
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun MainContentCamera(modifier: Modifier = Modifier) {
     var imageUri by remember { mutableStateOf(EMPTY_IMAGE_URI) }
     var context = LocalContext.current;
+    var pickedBitmap :Bitmap? = null
+
     if (imageUri != EMPTY_IMAGE_URI) {
         Box(modifier = modifier) {
             Image(
@@ -134,6 +142,11 @@ fun MainContentCamera(modifier: Modifier = Modifier) {
                     showGallerySelect = false
                     imageUri = uri
                     Log.d("select image",uri.toString())
+                    val source = ImageDecoder.createSource(context.contentResolver,imageUri!!)
+                    pickedBitmap = ImageDecoder.decodeBitmap(source)
+                    Log.d("bitmap",pickedBitmap.toString())
+
+
                 }
             )
         } else {

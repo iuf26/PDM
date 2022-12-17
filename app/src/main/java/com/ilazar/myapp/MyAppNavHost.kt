@@ -65,7 +65,11 @@ fun MyAppNavHost() {
         {
             ItemScreen(
                 itemId = it.arguments?.getString("id"),
-                onClose = { onCloseItem() }
+                onClose = { onCloseItem() },
+                onCameraOpen = {
+                    navController.navigate("camera")
+                }
+
             )
 
 
@@ -77,7 +81,11 @@ fun MyAppNavHost() {
         {
             ItemScreen(
                 itemId = null,
-                onClose = { onCloseItem() }
+                onClose = { onCloseItem() },
+                onCameraOpen =  {
+                    navController.navigate("camera")
+                }
+
             )
         }
         composable(route = authRoute)

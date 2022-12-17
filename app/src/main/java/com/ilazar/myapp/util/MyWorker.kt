@@ -24,11 +24,17 @@ class MyWorker(
         val id = workerParams.inputData.getString("id").toString();
         val text = workerParams.inputData.getString("text").toString()
         val passengers = workerParams.inputData.getInt("passengers",0)
+        val photo  = workerParams.inputData.getString("photo")
        // itemRepository.update(Item(id, text, passengers,false))
         val itemService:ItemService = Api.retrofit.create(ItemService::class.java);
 
         if(action == "update"){
-        itemService.update(id,Item(id, text, passengers,false))
+            if( photo != null) {
+                itemService.update(id, Item(id, text, passengers, false, photo))
+            }
+            else{
+                itemService.update(id, Item(id, text, passengers, false))
+            }
         }else{
             if(action == "add"){
                 itemService.create(Item(id, text, passengers,false))

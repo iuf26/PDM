@@ -68,7 +68,68 @@ class ItemViewModel(private val itemId: String?, private val itemRepository: Ite
         val takePhotoIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         application.startActivity(takePhotoIntent);
     }
+    fun saveOrUpdateItem2(text: String,passengers:Int,netStat: Boolean,photo:String){
+        viewModelScope.launch {
+            Log.d(TAG, "saveOrUpdateItem...");
+            try {
+                uiState = uiState.copy(isSaving = true, savingError = null)
+                val item = uiState.item?.copy(text = text, passengers = passengers)
+                if (itemId == null) {
+                    val constraints = Constraints.Builder()
+                        .setRequiredNetworkType(NetworkType.CONNECTED)
+                        .build()
+                    val inputData = Data.Builder().putString("action","add")
+                        .putString("id", item?._id)
+                        .putString("text",text)
+                        .putInt("passengers",passengers)
+                        .build()
+                    val myWork = OneTimeWorkRequest.Builder(MyWorker::class.java)
+                        .setConstraints(constraints)
+                        .setInputData(inputData)
+                        .build()
 
+                    workManager.apply {
+                        enqueue(myWork)
+                    }
+                    if (item != null) {
+                        itemRepository.handleItemCreated(item)
+                    }
+                } else {
+
+                    val constraints = Constraints.Builder()
+                        .setRequiredNetworkType(NetworkType.CONNECTED)
+                        .build()
+                    val inputData = Data.Builder().putString("action","update")
+                        .putString("id", item?._id)
+                        .putString("text",text)
+                        .putInt("passengers",passengers)
+                        .putString("photo",photo)
+                        .build()
+                    val myWork = OneTimeWorkRequest.Builder(MyWorker::class.java)
+                        .setConstraints(constraints)
+                        .setInputData(inputData)
+                        .build()
+
+
+                    workManager.apply {
+                        enqueue(myWork)
+                    }
+
+                    Log.d(TAG, "worker should work");
+                    //  itemRepository.update(item!!)
+                    if (item != null) {
+                        itemRepository.updateInLocalStorage(item)
+                    }
+                }
+                Log.d(TAG, "saveOrUpdateItem succeeded");
+                uiState = uiState.copy(isSaving = false, savingCompleted = true)
+            } catch (e: Exception) {
+                Log.d(TAG, "saveOrUpdateItem failed");
+
+                uiState = uiState.copy(isSaving = false, savingError = e)
+            }
+        }
+    }
     fun saveOrUpdateItem(text: String,passengers:Int,netStat: Boolean) {
         Log.d("Iulia see",passengers.toString())
         viewModelScope.launch {

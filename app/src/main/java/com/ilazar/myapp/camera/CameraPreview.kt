@@ -2,13 +2,23 @@ package com.ilazar.myapp.camera
 
 
 
+import android.graphics.ImageDecoder
+import android.media.Image
+import android.net.Uri
+import android.os.Build
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
+import androidx.annotation.RequiresPermission
 import androidx.camera.core.Preview
 import androidx.camera.core.UseCase
 import androidx.camera.view.PreviewView
+import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.viewinterop.AndroidView
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
 
 @Composable
 fun CameraPreview(
@@ -36,4 +46,14 @@ fun CameraPreview(
             previewView
         }
     )
+}
+
+@Composable
+fun ShowPhoto(
+    source: ImageBitmap?
+){
+    print("sourcei" + source?.toString())
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && source != null) {
+        androidx.compose.foundation.Image(bitmap = source, contentDescription = "img")
+    }
 }

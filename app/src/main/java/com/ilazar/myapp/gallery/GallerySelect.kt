@@ -2,6 +2,8 @@ package com.ilazar.myapp.gallery
 
 
 import android.Manifest
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -15,13 +17,17 @@ import com.ilazar.myapp.EMPTY_IMAGE_URI
 @ExperimentalPermissionsApi
 @Composable
 fun GallerySelect(
+
     onImageUri: (Uri) -> Unit = { }
 ) {
+    var pickedBit: Bitmap? = null
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri: Uri? ->
             onImageUri(uri ?: EMPTY_IMAGE_URI)
-        }
+
+        },
+
     )
 
     @Composable
